@@ -47,6 +47,9 @@ export default ({ data: bills, loading, error }) => {
   } else if (error) {
     return ErrorPage(error)
   }
+
+  const antiChrono = (a, b) => ((a.date < b.date) ? 1 : -1)
+  const billsSorted = [...bills].sort(antiChrono)
   
   return (`
     <div class='layout'>
@@ -69,7 +72,7 @@ export default ({ data: bills, loading, error }) => {
               </tr>
           </thead>
           <tbody data-testid="tbody">
-            ${rows(bills)}
+            ${rows(billsSorted)}
           </tbody>
           </table>
         </div>
