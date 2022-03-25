@@ -1,11 +1,11 @@
-import VerticalLayout from './VerticalLayout.js'
+import VerticalLayout from "./VerticalLayout.js"
 import ErrorPage from "./ErrorPage.js"
 import LoadingPage from "./LoadingPage.js"
 
-import Actions from './Actions.js'
+import Actions from "./Actions.js"
 
 const row = (bill) => {
-  return (`
+	return `
     <tr>
       <td>${bill.type}</td>
       <td>${bill.name}</td>
@@ -16,16 +16,21 @@ const row = (bill) => {
         ${Actions(bill.fileUrl)}
       </td>
     </tr>
-    `)
-  }
+    `
+}
 
 const rows = (data) => {
-  return (data && data.length) ? data.map(bill => row(bill)).join("") : ""
+	return data && data.length ? data.map((bill) => row(bill)).join("") : ""
+}
+
+const sortBills = (bills) => {
+	const antiChrono = (a, b) => (a.date < b.date ? 1 : -1)
+
+	return [...bills].sort(antiChrono)
 }
 
 export default ({ data: bills, loading, error }) => {
-  
-  const modal = () => (`
+	const modal = () => `
     <div class="modal fade" id="modaleFile" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
@@ -40,18 +45,42 @@ export default ({ data: bills, loading, error }) => {
         </div>
       </div>
     </div>
-  `)
+  `
 
-  if (loading) {
-    return LoadingPage()
-  } else if (error) {
-    return ErrorPage(error)
-  }
+	if (loading) {
+		return LoadingPage()
+	} else if (error) {
+		return ErrorPage(error)
+	}
 
-  const antiChrono = (a, b) => ((a.date < b.date) ? 1 : -1)
-  const billsSorted = [...bills].sort(antiChrono)
-  
-  return (`
+	let billsSorted = []
+
+	const validBills = (snap) => (snap.date === null ? true : false)
+	const invalidBills = (snap) => (snap.date === null ? false : true)
+
+	const cleanedBills = bills.filter(invalidBills)
+	let incriminateBills = []
+
+	try {
+		if (cleanedBills.length !== 0) {
+			incriminateBills = bills.filter(validBills)
+
+			billsSorted = sortBills(cleanedBills)
+
+			throw TypeError(
+				`One or mulptiple bill(s) contains invalid value(s) and was filtered to not display on the bills page`
+			)
+		}
+
+		billsSorted = sortBills(bills)
+	} catch (e) {
+		console.log(e, "for")
+		console.group()
+		incriminateBills.forEach((incriminateBill) => console.log(incriminateBill))
+		console.groupEnd()
+	}
+
+	return `
     <div class='layout'>
       ${VerticalLayout(120)}
       <div class='content'>
@@ -79,5 +108,4 @@ export default ({ data: bills, loading, error }) => {
       </div>
       ${modal()}
     </div>`
-  )
 }
