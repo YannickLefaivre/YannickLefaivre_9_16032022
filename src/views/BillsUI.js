@@ -1,31 +1,39 @@
-import VerticalLayout from './VerticalLayout.js'
+import VerticalLayout from "./VerticalLayout.js"
 import ErrorPage from "./ErrorPage.js"
 import LoadingPage from "./LoadingPage.js"
 
-import Actions from './Actions.js'
+import Actions from "./Actions.js"
 
 const row = (bill) => {
-  return (`
+	return `
     <tr>
       <td>${bill.type}</td>
       <td>${bill.name}</td>
-      <td>${bill.date}</td>
+      <td>${bill.hasOwnProperty("formattedDate") ? bill.formattedDate : bill.date}</td>
       <td>${bill.amount} €</td>
       <td>${bill.status}</td>
       <td>
         ${Actions(bill.fileUrl)}
       </td>
     </tr>
-    `)
-  }
+    `
+}
 
 const rows = (data) => {
-  return (data && data.length) ? data.map(bill => row(bill)).join("") : ""
+	return data && data.length ? data.map((bill) => row(bill)).join("") : ""
+}
+
+const invalidBills = (bill) => (bill.date === null ? false : true)
+
+const antiChrono = (a, b) => {
+  const currentDate = a.hasOwnProperty("ISODate") ? a.ISODate : a.date
+  const nextDate = b.hasOwnProperty("ISODate") ? b.ISODate : b.date
+
+  return (currentDate < nextDate ? 1 : (currentDate > nextDate) ? -1 : 0)
 }
 
 export default ({ data: bills, loading, error }) => {
-  
-  const modal = () => (`
+	const modal = () => `
     <div class="modal fade" id="modaleFile" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
@@ -40,18 +48,17 @@ export default ({ data: bills, loading, error }) => {
         </div>
       </div>
     </div>
-  `)
+  `
 
-  if (loading) {
-    return LoadingPage()
-  } else if (error) {
-    return ErrorPage(error)
-  }
+	if (loading) {
+		return LoadingPage()
+	} else if (error) {
+		return ErrorPage(error)
+	}
 
-  const antiChrono = (a, b) => ((a.date < b.date) ? 1 : -1)
-  const billsSorted = [...bills].sort(antiChrono)
-  
-  return (`
+	const billsSorted = bills.filter(invalidBills).sort(antiChrono)
+
+	return `
     <div class='layout'>
       ${VerticalLayout(120)}
       <div class='content'>
@@ -79,5 +86,4 @@ export default ({ data: bills, loading, error }) => {
       </div>
       ${modal()}
     </div>`
-  )
 }
