@@ -1,5 +1,5 @@
 import { ROUTES_PATH } from '../constants/routes.js'
-import { formatDate, formatStatus } from '../app/format.js'
+import { formatDate, formatDateInISO8601, formatStatus } from '../app/format.js'
 import Logout from './Logout.js'
 
 export default class {
@@ -42,10 +42,24 @@ export default class {
         .list()
         .then((snapshot) => {
           const bills = snapshot.map((doc) => {
-            return {
-              ...doc,
-              date: doc.date,
-              status: formatStatus(doc.status),
+            try {
+              if(doc.date === null) {
+                throw TypeError("One or mulptiple bill(s) contains invalid value(s) and was filtered to not display on the bills page")
+              }
+
+              return {
+                ...doc,
+                formattedDate: formatDate(doc.date),
+                ISODate: formatDateInISO8601(doc.date),
+                status: formatStatus(doc.status),
+              }
+            } catch (e) {
+              console.log(e, "for", doc)
+              return {
+                ...doc,
+                date: doc.date,
+                status: formatStatus(doc.status),
+              }
             }
           })
           console.log('length', bills.length)

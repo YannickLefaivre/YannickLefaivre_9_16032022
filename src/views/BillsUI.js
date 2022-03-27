@@ -9,7 +9,7 @@ const row = (bill) => {
     <tr>
       <td>${bill.type}</td>
       <td>${bill.name}</td>
-      <td>${bill.date}</td>
+      <td>${bill.hasOwnProperty("formattedDate") ? bill.formattedDate : bill.date}</td>
       <td>${bill.amount} €</td>
       <td>${bill.status}</td>
       <td>
@@ -23,10 +23,13 @@ const rows = (data) => {
 	return data && data.length ? data.map((bill) => row(bill)).join("") : ""
 }
 
-const sortBills = (bills) => {
-	const antiChrono = (a, b) => (a.date < b.date ? 1 : -1)
+const invalidBills = (bill) => (bill.date === null ? false : true)
 
-	return [...bills].sort(antiChrono)
+const antiChrono = (a, b) => {
+  const currentDate = a.hasOwnProperty("ISODate") ? a.ISODate : a.date
+  const nextDate = b.hasOwnProperty("ISODate") ? b.ISODate : b.date
+
+  return (currentDate < nextDate ? 1 : (currentDate > nextDate) ? -1 : 0)
 }
 
 export default ({ data: bills, loading, error }) => {
@@ -53,32 +56,7 @@ export default ({ data: bills, loading, error }) => {
 		return ErrorPage(error)
 	}
 
-	let billsSorted = []
-
-	const validBills = (snap) => (snap.date === null ? true : false)
-	const invalidBills = (snap) => (snap.date === null ? false : true)
-
-	const cleanedBills = bills.filter(invalidBills)
-	let incriminateBills = []
-
-	try {
-		if (cleanedBills.length !== 0) {
-			incriminateBills = bills.filter(validBills)
-
-			billsSorted = sortBills(cleanedBills)
-
-			throw TypeError(
-				`One or mulptiple bill(s) contains invalid value(s) and was filtered to not display on the bills page`
-			)
-		}
-
-		billsSorted = sortBills(bills)
-	} catch (e) {
-		console.log(e, "for")
-		console.group()
-		incriminateBills.forEach((incriminateBill) => console.log(incriminateBill))
-		console.groupEnd()
-	}
+	const billsSorted = bills.filter(invalidBills).sort(antiChrono)
 
 	return `
     <div class='layout'>
