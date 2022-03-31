@@ -29,6 +29,7 @@ export default class NewBill {
       fileField.setCustomValidity("Le justificatif que vous fournissez doit être dans l'un de ses formats : png, jpeg ou jpg")
       return
     } else {
+      this.fileHaveInvalidExtension = false
       fileField.setCustomValidity("")
     }
 
