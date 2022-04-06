@@ -53,6 +53,10 @@ textarea, input, select {
   opacity: 0.7 !important;
 }
 
+.invalid-form-control {
+  border: 2px solid rgb(150, 0, 0) !important;
+}
+
 textarea:focus, input:focus, select:focus {
   color: #0E5AE5 !important;
   opacity: 1 !important;
@@ -60,4 +64,13 @@ textarea:focus, input:focus, select:focus {
 
 *[placeholder] {
   color: #0E5AE5 !important;
+}
+
+.error-message {
+  padding: 0.5rem;
+  color: rgb(140, 0, 0);
+}
+
+.hidden {
+  display: none;
 }
