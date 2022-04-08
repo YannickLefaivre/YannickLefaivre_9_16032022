@@ -20,7 +20,12 @@ const row = (bill) => {
 }
 
 const rows = (data) => {
-	return data && data.length ? data.map((bill) => row(bill)).join("") : ""
+	if(data && data.length) {
+    const billsSorted = data.filter(invalidBills).sort(antiChrono)
+    return billsSorted.map((bill) => row(bill)).join("")
+  } else {
+    return ""
+  }
 }
 
 const invalidBills = (bill) => (bill.date === null ? false : true)
@@ -56,8 +61,6 @@ export default ({ data: bills, loading, error }) => {
 		return ErrorPage(error)
 	}
 
-	const billsSorted = bills.filter(invalidBills).sort(antiChrono)
-
 	return `
     <div class='layout'>
       ${VerticalLayout(120)}
@@ -79,7 +82,7 @@ export default ({ data: bills, loading, error }) => {
               </tr>
           </thead>
           <tbody data-testid="tbody">
-            ${rows(billsSorted)}
+            ${rows(bills)}
           </tbody>
           </table>
         </div>
