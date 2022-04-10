@@ -178,9 +178,9 @@ describe('Given I am connected as an employee', () => {
 
       expect(handleChangeFile).toBeCalled()
 
-      expect(spyCreate).toHaveBeenCalled()
-
       await spyCreate()
+      
+      expect(spyCreate).toHaveBeenCalled()
 
       expect(newBill.billId).toBe('1234')
       expect(newBill.fileUrl).toBe('https://localhost:3456/images/test.jpg')
@@ -189,7 +189,6 @@ describe('Given I am connected as an employee', () => {
 
   describe('When an error occurs on API', () => {
     beforeEach(() => {
-      jest.spyOn(mockStore, "bills")
       Object.defineProperty(
           window,
           'localStorage',
@@ -199,42 +198,93 @@ describe('Given I am connected as an employee', () => {
         type: 'Employee',
         email: "a@a"
       }))
-      const root = document.createElement("div")
-      root.setAttribute("id", "root")
-      document.body.appendChild(root)
-      router()
+
+      document.body.innerHTML = NewBillUI()
     })
 
     test("Then new bill are added to the API but fetch fails with 404 message error", async () => {
-      mockStore.bills.mockImplementationOnce(() => {
+      const spyedMockStore = jest.spyOn(mockStore, "bills")
+
+      spyedMockStore.mockImplementationOnce(() => {
         return {
-          create: () => {
-            return Promise.reject(new Error("Erreur 404"))
-          }
+          create: jest.fn().mockRejectedValue(new Error("Erreur 404"))
         }
       })
       
-      document.body.innerHTML = BillsUI({error: "Erreur 404"})
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname, data: bills })
+      }
 
-      const message = screen.getByText(/Erreur 404/)
+      new NewBill({
+        document,
+        onNavigate,
+        store: mockStore,
+        bills: bills,
+        localStorage: window.localStorage,
+      })
       
-      expect(message).toBeTruthy()
+      const fileInput = screen.getByLabelText('Justificatif')
+
+      fireEvent.change(fileInput, {
+        target: {
+          files: [
+            new File(['test'], 'test.jpg', {
+              type: 'image/jpeg',
+            }),
+          ],
+        },
+      })
+
+      const { billId, fileUrl } = await spyedMockStore()
+
+      expect(spyedMockStore).toHaveBeenCalled()
+
+      expect(billId).toBeUndefined()
+      expect(fileUrl).toBeUndefined()
+
+      spyedMockStore.mockReset()
+      spyedMockStore.mockRestore()
     })
 
     test("Then new bill are added to the API but fetch fails with 500 message error", async () => {
-      mockStore.bills.mockImplementationOnce(() => {
+      const spyedMockStore = jest.spyOn(mockStore, "bills")
+
+      spyedMockStore.mockImplementationOnce(() => {
         return {
-          create: () => {
-            return Promise.reject(new Error("Erreur 500"))
-          }
+          create: jest.fn().mockRejectedValue(new Error("Erreur 500"))
         }
       })
       
-      document.body.innerHTML = BillsUI({error: "Erreur 500"})
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname, data: bills })
+      }
 
-      const message = screen.getByText(/Erreur 500/)
-      
-      expect(message).toBeTruthy()
+      new NewBill({
+        document,
+        onNavigate,
+        store: mockStore,
+        bills: bills,
+        localStorage: window.localStorage,
+      })
+
+      const fileInput = screen.getByLabelText('Justificatif')
+
+      fireEvent.change(fileInput, {
+        target: {
+          files: [
+            new File(['test'], 'test.jpg', {
+              type: 'image/jpeg',
+            }),
+          ],
+        },
+      })
+
+      const { billId, fileUrl } = await spyedMockStore()
+
+      expect(spyedMockStore).toHaveBeenCalled()
+
+      expect(billId).toBeUndefined()
+      expect(fileUrl).toBeUndefined()
     })
   })
 })

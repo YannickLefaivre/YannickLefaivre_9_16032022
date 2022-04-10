@@ -1,9 +1,20 @@
 {
   "scripts": {
+    "ui-ux-test-report": "jest src/__tests__/Actions.js src/__tests__/Bills.js src/__tests__/Dashboard.js src/__tests__/DashboardFormUI.js src/__tests__/ErrorPage.js src/__tests__/LoadingPage.js src/__tests__/Login.js src/__tests__/Logout.js src/__tests__/NewBill.js src/__tests__/VerticalLayout.js --noStackTrace --silent",
     "test": "jest --coverage --noStackTrace --silent"
   },
   "jest": {
     "verbose": false,
+    "reporters": [
+      "default",
+      [
+        "./node_modules/jest-html-reporter",
+        {
+          "pageTitle": "Test Report",
+          "sort": "titleAsc"
+        }
+      ]
+    ],
     "setupFiles": [
       "./setup-jest.js"
     ],
@@ -32,6 +43,7 @@
     "bootstrap": "^5.1.3",
     "jest": "^26.1.0",
     "jest-environment-jsdom": "^27.4.6",
+    "jest-html-reporter": "^3.4.2",
     "node-fetch": "^3.2.3"
   }
 }
