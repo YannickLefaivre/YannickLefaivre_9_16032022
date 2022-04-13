@@ -215,7 +215,7 @@ describe('Given I am connected as an employee', () => {
         document.body.innerHTML = ROUTES({ pathname, data: bills })
       }
 
-      new NewBill({
+      const newBill = new NewBill({
         document,
         onNavigate,
         store: mockStore,
@@ -235,12 +235,12 @@ describe('Given I am connected as an employee', () => {
         },
       })
 
-      const { billId, fileUrl } = await spyedMockStore()
+      await spyedMockStore()
 
       expect(spyedMockStore).toHaveBeenCalled()
 
-      expect(billId).toBeUndefined()
-      expect(fileUrl).toBeUndefined()
+      expect(newBill.billId).toBeNull()
+      expect(newBill.fileUrl).toBeNull()
 
       spyedMockStore.mockReset()
       spyedMockStore.mockRestore()
@@ -259,7 +259,7 @@ describe('Given I am connected as an employee', () => {
         document.body.innerHTML = ROUTES({ pathname, data: bills })
       }
 
-      new NewBill({
+      const newBill = new NewBill({
         document,
         onNavigate,
         store: mockStore,
@@ -279,12 +279,12 @@ describe('Given I am connected as an employee', () => {
         },
       })
 
-      const { billId, fileUrl } = await spyedMockStore()
+      await spyedMockStore()
 
       expect(spyedMockStore).toHaveBeenCalled()
 
-      expect(billId).toBeUndefined()
-      expect(fileUrl).toBeUndefined()
+      expect(newBill.billId).toBeNull()
+      expect(newBill.fileUrl).toBeNull()
     })
   })
 })
