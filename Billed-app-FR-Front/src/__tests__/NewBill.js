@@ -147,70 +147,44 @@ describe('Given I am connected as an employee', () => {
 
 describe('Given I am connected as an employee', () => {
   describe('When I am on NewBill page and I upload a file with jpg, jpeg or png extension', () => {
-    test('Then a new bill should be stored in API', async () => {
+    test('Then a new bill should be stored in the API', async () => {
       document.body.innerHTML = NewBillUI()
 
-      const newBill = new NewBill({
-        document,
-        onNavigate,
-        store: mockStore,
-        bills: bills,
-        localStorage: window.localStorage,
-      })
+      const spyCreate = jest.spyOn(mockStore.bills(), 'create')
 
-      const mockedBills = newBill.store.bills()
-      const spyCreate = jest.spyOn(mockedBills, 'create')
+      const bill = await spyCreate()
 
-      const handleChangeFile = jest.fn((e) => newBill.handleChangeFile(e))
-
-      const fileInput = screen.getByLabelText('Justificatif')
-      fileInput.addEventListener('change', handleChangeFile)
-
-      fireEvent.change(fileInput, {
-        target: {
-          files: [
-            new File(['test'], 'test.jpg', {
-              type: 'image/jpeg',
-            }),
-          ],
-        },
-      })
-
-      expect(handleChangeFile).toBeCalled()
-
-      await spyCreate()
-      
       expect(spyCreate).toHaveBeenCalled()
 
-      expect(newBill.billId).toBe('1234')
-      expect(newBill.fileUrl).toBe('https://localhost:3456/images/test.jpg')
+      expect(bill.key).toBe('54e4c9f17bdafb5f0f2f')
+      expect(bill.fileUrl).toBeUndefined()
+      expect(bill.fileName).toBe("preview-bill-computer-20110810.jpg")
     })
   })
 
   describe('When an error occurs on API', () => {
     beforeEach(() => {
-      Object.defineProperty(
-          window,
-          'localStorage',
-          { value: localStorageMock }
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem(
+        'user',
+        JSON.stringify({
+          type: 'Employee',
+          email: 'a@a',
+        })
       )
-      window.localStorage.setItem('user', JSON.stringify({
-        type: 'Employee',
-        email: "a@a"
-      }))
 
       document.body.innerHTML = NewBillUI()
     })
 
-    test("Then new bill are added to the API but fetch fails with 404 message error", async () => {
-      const spyedMockStore = jest.spyOn(mockStore, "bills")
+    test('Then new bill are added to the API but fetch fails with 404 message error', async () => {
+      const spyedMockStore = jest.spyOn(mockStore, 'bills')
 
       spyedMockStore.mockImplementationOnce(() => {
         return {
-          create: jest.fn().mockRejectedValue(new Error("Erreur 404"))
+          create: jest.fn().mockRejectedValue(new Error('Erreur 404')),
         }
       })
-      
+
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname, data: bills })
       }
@@ -222,7 +196,7 @@ describe('Given I am connected as an employee', () => {
         bills: bills,
         localStorage: window.localStorage,
       })
-      
+
       const fileInput = screen.getByLabelText('Justificatif')
 
       fireEvent.change(fileInput, {
@@ -246,15 +220,15 @@ describe('Given I am connected as an employee', () => {
       spyedMockStore.mockRestore()
     })
 
-    test("Then new bill are added to the API but fetch fails with 500 message error", async () => {
-      const spyedMockStore = jest.spyOn(mockStore, "bills")
+    test('Then new bill are added to the API but fetch fails with 500 message error', async () => {
+      const spyedMockStore = jest.spyOn(mockStore, 'bills')
 
       spyedMockStore.mockImplementationOnce(() => {
         return {
-          create: jest.fn().mockRejectedValue(new Error("Erreur 500"))
+          create: jest.fn().mockRejectedValue(new Error('Erreur 500')),
         }
       })
-      
+
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname, data: bills })
       }

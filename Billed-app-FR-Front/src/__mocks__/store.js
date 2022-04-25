@@ -1,5 +1,9 @@
 const mockedBills = {
   list() {
+    return Promise.reject(new Error('Erreur 404'))
+  },
+
+  list() {
     return Promise.resolve([{
       "id": "47qAXb6fIm2zOKkLzMro",
       "vat": "80",
@@ -63,7 +67,21 @@ const mockedBills = {
 
   },
   create(bill) {
-    return Promise.resolve({fileUrl: 'https://localhost:3456/images/test.jpg', key: '1234'})
+    return Promise.resolve({
+        "key": '54e4c9f17bdafb5f0f2f',
+        "vat": '70',
+        "fileUrl": 'https://localhost:3456/images/test.jpg',
+        "status": 'pending',
+        "type": 'Equipement et matériel',
+        "commentary": "Achat d'un ordinateur portable pour les déplacements",
+        "name": 'Ordinateur portable',
+        "fileName": 'preview-bill-computer-20110810.jpg',
+        "date": '2011-08-10',
+        "amount": 348,
+        "commentAdmin": '',
+        "email": 'a@a',
+        "pct": 20,
+    })
   },
   update(bill) {
     return Promise.resolve({
