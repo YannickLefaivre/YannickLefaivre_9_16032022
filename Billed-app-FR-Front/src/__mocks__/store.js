@@ -1,9 +1,5 @@
 const mockedBills = {
   list() {
-    return Promise.reject(new Error('Erreur 404'))
-  },
-
-  list() {
     return Promise.resolve([{
       "id": "47qAXb6fIm2zOKkLzMro",
       "vat": "80",
@@ -66,39 +62,26 @@ const mockedBills = {
       }])
 
   },
+
+  /**
+   * 
+   * @description create the bill passed in parameter in the API and returns it creation related informations
+   * @param {bill} bill 
+   * @returns {bill} return bill creation informations
+   */
   create(bill) {
     return Promise.resolve({
-        "key": '54e4c9f17bdafb5f0f2f',
-        "vat": '70',
-        "fileUrl": 'https://localhost:3456/images/test.jpg',
-        "status": 'pending',
-        "type": 'Equipement et matériel',
-        "commentary": "Achat d'un ordinateur portable pour les déplacements",
-        "name": 'Ordinateur portable',
-        "fileName": 'preview-bill-computer-20110810.jpg',
-        "date": '2011-08-10',
-        "amount": 348,
-        "commentAdmin": '',
-        "email": 'a@a',
-        "pct": 20,
+        "createdAt": "2004-04-04T09:56:30.346Z",
+        "email": bill.email,
+        "filePath": "https://firebasestorage.googleapis.com/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a",
+        "fileName": bill.fileName,
+        "id": 4,
+        "key": '47qAXb6fIm2zOKkLzMro',
+        "updateAt": "2004-04-04T09:56:30.346Z"
     })
   },
   update(bill) {
-    return Promise.resolve({
-      "id": "47qAXb6fIm2zOKkLzMro",
-      "vat": "80",
-      "fileUrl": "https://firebasestorage.googleapis.com/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a",
-      "status": "pending",
-      "type": "Hôtel et logement",
-      "commentary": "séminaire billed",
-      "name": "encore",
-      "fileName": "preview-facture-free-201801-pdf-1.jpg",
-      "date": "2004-04-04",
-      "amount": 400,
-      "commentAdmin": "ok",
-      "email": "a@a",
-      "pct": 20
-    })
+    return Promise.resolve(bill)
   },
 }
 
